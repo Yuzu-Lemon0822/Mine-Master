@@ -86,12 +86,15 @@ for (let x = -2; x <= 2; x++) {
 setBlock([0, 1, 0], [1, 1, 1], "Stone.png")
 
 // ====================
-// カメラ操作（FPS風）
+// カメラ操作（正統FPS）
 // ====================
 const keys = {};
 let isMouseDown = false;
 let yaw = 0;
 let pitch = 0;
+
+canvas.tabIndex = 1; // フォーカス取得用
+canvas.focus();
 
 document.addEventListener("keydown", (e) => {
   keys[e.code] = true;
@@ -100,43 +103,37 @@ document.addEventListener("keyup", (e) => {
   keys[e.code] = false;
 });
 
-// マウス操作
-document.addEventListener("mousedown", () => {
+// マウス操作（canvas限定）
+canvas.addEventListener("mousedown", () => {
   isMouseDown = true;
 });
 document.addEventListener("mouseup", () => {
   isMouseDown = false;
 });
-document.addEventListener("mousemove", (e) => {
+canvas.addEventListener("mousemove", (e) => {
   if (!isMouseDown) return;
 
   const sensitivity = 0.002;
   yaw   -= e.movementX * sensitivity;
   pitch -= e.movementY * sensitivity;
 
-  // 見上げすぎ防止
   pitch = Math.max(-Math.PI / 2, Math.min(Math.PI / 2, pitch));
 
-  camera.rotation.set(pitch, yaw, 0);
+  camera.rotation.order = "YXZ";
+  camera.rotation.y = yaw;
+  camera.rotation.x = pitch;
 });
 
-// ====================
-// 移動処理
-// ====================
 function updateCameraMovement() {
   const speed = 0.1;
 
-  const forward = new THREE.Vector3(
-    Math.sin(yaw),
-    0,
-    Math.cos(yaw)
-  ).normalize();
+  const forward = new THREE.Vector3();
+  camera.getWorldDirection(forward);
+  forward.y = 0;
+  forward.normalize();
 
-  const right = new THREE.Vector3(
-    Math.cos(yaw),
-    0,
-    -Math.sin(yaw)
-  ).normalize();
+  const right = new THREE.Vector3();
+  right.crossVectors(forward, camera.up).normalize();
 
   if (keys["KeyW"]) camera.position.addScaledVector(forward, speed);
   if (keys["KeyS"]) camera.position.addScaledVector(forward, -speed);
