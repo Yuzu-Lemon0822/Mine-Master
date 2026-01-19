@@ -68,14 +68,15 @@ function setBlock(x, y, z, texture) {
 const CHUNK_SIZE = 8;
 const VIEW_RADIUS = 2; // 周囲25チャンク
 
-const wall = 0;
+const wall = 1;
 const random = [1, 5, 3, 9, 6, 2];
 
 const oreData = [
   { type: "Coal_Ore", min: 0, max: 200, per: 0.10 },
-  { type: "Iron_Ore", min: 50, max: 600, per: 0.08 },
-  { type: "Gold_Ore", min: 250, max: 1000, per: 0.05 },
-  { type: "Diamond_Ore", min: 500, max: 2000, per: 0.02 },
+  { type: "Copper_Ore", min: 50, max: 600, per: 0.08 },
+  { type: "Iron_Ore", min: 100, max: 800, per: 0.08 },
+  { type: "Gold_Ore", min: 250, max: 1500, per: 0.05 },
+  { type: "Diamond_Ore", min: 500, max: 3000, per: 0.02 },
 ];
 
 // ====================
@@ -120,11 +121,11 @@ function generateChunk(cx, cz) {
       const wx = baseX + x;
       const wz = baseZ + z;
 
-      setBlock(wx, -12, wz, "Stone"); // floor
-      setBlock(wx, -6, wz, "Stone");  // ceiling
+      setBlock(wx, 0, wz, "Stone"); // floor
+      setBlock(wx, 5, wz, "Stone");  // ceiling
 
       if (generate(cx, cz) === wall) {
-        for (let y = -11; y <= -7; y++) {
+        for (let y = 1; y < 5; y++) {
           setBlock(wx, y, wz, pickOre(wx, wz));
         }
       }
