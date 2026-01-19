@@ -49,7 +49,7 @@ function setBlock(pos, rotate, texture) {
   const [roll, pitch, yaw] = rotate;
 
   if (!textureCache[texture]) {
-    const tex = loader.load("./texture/" + texture);
+    const tex = loader.load("./texture/" + texture + ".png");
     tex.magFilter = THREE.NearestFilter;
     tex.minFilter = THREE.NearestFilter;
     tex.generateMipmaps = false;
@@ -68,15 +68,17 @@ function setBlock(pos, rotate, texture) {
   return block;
 }
 
+
+const textureList = ["Stone", "Coal_Ore", "Copper_Ore", "Iron_Ore", "Gold_Ore", "Diamond_Ore"]
+
 // ====================
 // test blocks 🧱
 // ====================
-for (let x = -2; x <= 2; x++) {
-  for (let z = -2; z <= 2; z++) {
-    setBlock([x, 0, z], [0, 0, 0], "Stone.png");
+for (let x = -10; x <= 10; x++) {
+  for (let z = -10; z <= 10; z++) {
+    setBlock([x, 0, z], [0, 0, 0], textureList[Math.floor(Math.random()*6)]);
   }
 }
-setBlock([0, 1, 0], [1, 1, 1], "Stone.png");
 
 // ====================
 // input (keyboard)
