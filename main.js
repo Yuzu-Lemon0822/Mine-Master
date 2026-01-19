@@ -78,7 +78,12 @@ function setBlock(pos, rotate, texture) {
 // ====================
 // test block 🧱
 // ====================
-setBlock([0, 0, 0], [0, 0, 0], "Stone.png");
+for (let x = -2; x <= 2; x++) {
+  for (let z = -2; z <= 2; z++) {
+    setBlock([x, 0, z], [0, 0, 0], "Stone.png");
+  }
+}
+setBlock([0, 1, 0], [1, 1, 1], "Stone.png")
 
 // ====================
 // render loop
