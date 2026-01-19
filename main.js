@@ -29,8 +29,8 @@ scene.add(yawObject);
 yawObject.position.set(4, 4, 4);
 
 // light
-scene.add(new THREE.AmbientLight(0xffffff, 0.4));
-const dirLight = new THREE.DirectionalLight(0xffffff, 1);
+scene.add(new THREE.AmbientLight(0x999999, 0.4));
+const dirLight = new THREE.DirectionalLight(0x999999, 1);
 dirLight.position.set(5, 10, 5);
 scene.add(dirLight);
 
