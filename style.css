@@ -10,3 +10,14 @@ html, body {
   width: 100vw;
   height: 100vh;
 }
+
+#version {
+  position: fixed;
+  top: 6px;
+  left: 8px;
+  color: #8f8;
+  font-family: monospace;
+  font-size: 12px;
+  opacity: 0.8;
+  pointer-events: none;
+}
