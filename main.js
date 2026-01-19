@@ -85,26 +85,30 @@ window.addEventListener("keydown", e => keys[e.code] = true);
 window.addEventListener("keyup", e => keys[e.code] = false);
 
 // ====================
-// mouse look 🖱
+// camera rotation (arrow keys) 🎯
 // ====================
-const sensitivity = 0.002;
+const rotateSpeed = 0.03;
 
-canvas.addEventListener("click", () => {
-  canvas.requestPointerLock();
-});
+function updateCameraRotation() {
+  if (keys["ArrowLeft"]) {
+    yawObject.rotation.y += rotateSpeed;
+  }
+  if (keys["ArrowRight"]) {
+    yawObject.rotation.y -= rotateSpeed;
+  }
+  if (keys["ArrowUp"]) {
+    pitchObject.rotation.x += rotateSpeed;
+  }
+  if (keys["ArrowDown"]) {
+    pitchObject.rotation.x -= rotateSpeed;
+  }
 
-document.addEventListener("mousemove", e => {
-  if (document.pointerLockElement !== canvas) return;
-
-  yawObject.rotation.y -= e.movementX * sensitivity;
-  pitchObject.rotation.x -= e.movementY * sensitivity;
-
-  // 上下見すぎ防止
+  // 上下の見過ぎ防止
   pitchObject.rotation.x = Math.max(
     -Math.PI / 2,
     Math.min(Math.PI / 2, pitchObject.rotation.x)
   );
-});
+}
 
 // ====================
 // movement 🚶
@@ -133,6 +137,7 @@ function updateMovement() {
 function animate() {
   requestAnimationFrame(animate);
 
+  updateCameraRotation(); // ← 追加
   updateMovement();
   renderer.render(scene, camera);
 }
