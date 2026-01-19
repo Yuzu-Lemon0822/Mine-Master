@@ -86,14 +86,78 @@ for (let x = -2; x <= 2; x++) {
 setBlock([0, 1, 0], [1, 1, 1], "Stone.png")
 
 // ====================
+// カメラ操作（FPS風）
+// ====================
+const keys = {};
+let isMouseDown = false;
+let yaw = 0;
+let pitch = 0;
+
+document.addEventListener("keydown", (e) => {
+  keys[e.code] = true;
+});
+document.addEventListener("keyup", (e) => {
+  keys[e.code] = false;
+});
+
+// マウス操作
+document.addEventListener("mousedown", () => {
+  isMouseDown = true;
+});
+document.addEventListener("mouseup", () => {
+  isMouseDown = false;
+});
+document.addEventListener("mousemove", (e) => {
+  if (!isMouseDown) return;
+
+  const sensitivity = 0.002;
+  yaw   -= e.movementX * sensitivity;
+  pitch -= e.movementY * sensitivity;
+
+  // 見上げすぎ防止
+  pitch = Math.max(-Math.PI / 2, Math.min(Math.PI / 2, pitch));
+
+  camera.rotation.set(pitch, yaw, 0);
+});
+
+// ====================
+// 移動処理
+// ====================
+function updateCameraMovement() {
+  const speed = 0.1;
+
+  const forward = new THREE.Vector3(
+    Math.sin(yaw),
+    0,
+    Math.cos(yaw)
+  ).normalize();
+
+  const right = new THREE.Vector3(
+    Math.cos(yaw),
+    0,
+    -Math.sin(yaw)
+  ).normalize();
+
+  if (keys["KeyW"]) camera.position.addScaledVector(forward, speed);
+  if (keys["KeyS"]) camera.position.addScaledVector(forward, -speed);
+  if (keys["KeyA"]) camera.position.addScaledVector(right, -speed);
+  if (keys["KeyD"]) camera.position.addScaledVector(right, speed);
+
+  if (keys["Space"]) camera.position.y += speed;
+  if (keys["KeyC"])  camera.position.y -= speed;
+}
+
+// ====================
 // render loop
 // ====================
 function animate() {
   requestAnimationFrame(animate);
+
+  updateCameraMovement(); // ←これ！
+
   renderer.render(scene, camera);
 }
-animate();
-
+animate()
 // ====================
 // resize
 // ====================
