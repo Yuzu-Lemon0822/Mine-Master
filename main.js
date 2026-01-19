@@ -17,8 +17,15 @@ const camera = new THREE.PerspectiveCamera(
   0.1,
   100
 );
-camera.position.set(4, 4, 4);
-camera.lookAt(0, 0, 0);
+
+// 視点用のオブジェクト（yaw / pitch 分離）
+const yawObject = new THREE.Object3D();
+const pitchObject = new THREE.Object3D();
+yawObject.add(pitchObject);
+pitchObject.add(camera);
+scene.add(yawObject);
+
+yawObject.position.set(4, 4, 4);
 
 // light
 scene.add(new THREE.AmbientLight(0xffffff, 0.4));
@@ -31,8 +38,6 @@ scene.add(dirLight);
 // ====================
 const loader = new THREE.TextureLoader();
 const geometry = new THREE.BoxGeometry(1, 1, 1);
-
-// テクスチャキャッシュ（同じPNGを何度もロードしない）
 const textureCache = {};
 
 // ====================
@@ -42,7 +47,6 @@ function setBlock(pos, rotate, texture) {
   const [x, y, z] = pos;
   const [roll, pitch, yaw] = rotate;
 
-  // texture load (with cache)
   if (!textureCache[texture]) {
     const tex = loader.load("./texture/" + texture);
     tex.magFilter = THREE.NearestFilter;
@@ -56,34 +60,72 @@ function setBlock(pos, rotate, texture) {
   });
 
   const block = new THREE.Mesh(geometry, material);
-
-  // position (center-based)
-  block.position.set(
-    x + 0.5,
-    y + 0.5,
-    z + 0.5
-  );
-
-  // rotation (roll, pitch, yaw)
-  block.rotation.set(
-    roll,
-    pitch,
-    yaw
-  );
+  block.position.set(x + 0.5, y + 0.5, z + 0.5);
+  block.rotation.set(roll, pitch, yaw);
 
   scene.add(block);
   return block;
 }
 
 // ====================
-// test block 🧱
+// test blocks 🧱
 // ====================
 for (let x = -2; x <= 2; x++) {
   for (let z = -2; z <= 2; z++) {
     setBlock([x, 0, z], [0, 0, 0], "Stone.png");
   }
 }
-setBlock([0, 1, 0], [1, 1, 1], "Stone.png")
+setBlock([0, 1, 0], [1, 1, 1], "Stone.png");
+
+// ====================
+// input (keyboard)
+// ====================
+const keys = {};
+window.addEventListener("keydown", e => keys[e.code] = true);
+window.addEventListener("keyup", e => keys[e.code] = false);
+
+// ====================
+// mouse look 🖱
+// ====================
+const sensitivity = 0.002;
+
+canvas.addEventListener("click", () => {
+  canvas.requestPointerLock();
+});
+
+document.addEventListener("mousemove", e => {
+  if (document.pointerLockElement !== canvas) return;
+
+  yawObject.rotation.y -= e.movementX * sensitivity;
+  pitchObject.rotation.x -= e.movementY * sensitivity;
+
+  // 上下見すぎ防止
+  pitchObject.rotation.x = Math.max(
+    -Math.PI / 2,
+    Math.min(Math.PI / 2, pitchObject.rotation.x)
+  );
+});
+
+// ====================
+// movement 🚶
+// ====================
+const velocity = new THREE.Vector3();
+const speed = 0.1;
+
+function updateMovement() {
+  velocity.set(0, 0, 0);
+
+  if (keys["KeyW"]) velocity.z -= speed;
+  if (keys["KeyS"]) velocity.z += speed;
+  if (keys["KeyA"]) velocity.x -= speed;
+  if (keys["KeyD"]) velocity.x += speed;
+  if (keys["Space"]) velocity.y += speed;
+  if (keys["ShiftLeft"]) velocity.y -= speed;
+
+  // カメラの向きに合わせて移動
+  velocity.applyQuaternion(yawObject.quaternion);
+  yawObject.position.add(velocity);
+}
 
 // ====================
 // render loop
@@ -91,9 +133,11 @@ setBlock([0, 1, 0], [1, 1, 1], "Stone.png")
 function animate() {
   requestAnimationFrame(animate);
 
+  updateMovement();
   renderer.render(scene, camera);
 }
-animate()
+animate();
+
 // ====================
 // resize
 // ====================
