@@ -28,7 +28,7 @@ scene.add(new THREE.AmbientLight(0xffffff, 0.3));
 
 // texture
 const loader = new THREE.TextureLoader();
-const texture = loader.load("./texture/Stone/stone.png");
+const texture = loader.load("./texture/Stone.png");
 
 texture.magFilter = THREE.NearestFilter;
 texture.minFilter = THREE.NearestFilter;
